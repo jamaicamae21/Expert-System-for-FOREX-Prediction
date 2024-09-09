@@ -1,0 +1,85 @@
+:- use_module(library(csv)).
+
+main :-
+    init_dynamic_fact,
+    read_csv_file('ohlc_data.csv', Rows),
+    process_rows(Rows).
+
+init_dynamic_fact :-
+    retractall(moving_average(_, _)), % Clear previous moving average facts
+    assertz(current_sum(0)),
+    assertz(current_count(0)),
+    assertz(values([])).
+
+read_csv_file(File, Rows) :-
+    csv_read_file(File, Rows, [functor(row)]).
+
+process_rows([]).
+process_rows([Row|Rows]) :-
+    Row = row(O_val, H_val, L_val, C_val),
+    (green_candlestick(ohlc(O_val, H_val, L_val, C_val)) ->
+        assertz(green(O_val, H_val, L_val, C_val))
+    ;red_candlestick(ohlc(O_val, H_val, L_val, C_val)) ->
+        assertz(red(O_val, H_val, L_val, C_val))
+    ),
+    update_moving_averages(C_val),
+    process_rows(Rows).
+
+green_candlestick(ohlc(Open, High, Low, Close)) :-
+    Open < Close,
+    High >= Close,
+    Low =< Open.
+
+red_candlestick(ohlc(Open, High, Low, Close)) :-
+    Open > Close,
+    High >= Open,
+    Low =< Close.
+
+update_moving_averages(Close) :-
+    retract(current_sum(Sum)),
+    retract(current_count(Count)),
+    retract(values(Values)),
+    NewSum is Sum + Close,
+    NewCount is Count + 1,
+    append(Values, [Close], NewValues),
+    assertz(current_sum(NewSum)),
+    assertz(current_count(NewCount)),
+    assertz(values(NewValues)),
+    (NewCount >= 10 -> calculate_and_assert_moving_average(10)
+    ;true),
+    (NewCount >= 20 -> calculate_and_assert_moving_average(20)
+    ;true),
+    (NewCount >= 50 -> calculate_and_assert_moving_average(50)
+    ;true),
+     (Values = [First|_], last(Values, Last) ->
+        format("First value: ~w\n", [First]),
+        format("Last value: ~w\n", [Last])
+    ;true).
+
+calculate_and_assert_moving_average(Period) :-
+    current_sum(Sum),
+    current_count(Count),
+    values(Values),
+    length(Values, NumValues),
+    StartIndex is NumValues - Count + 1,
+    sublist(Values, StartIndex, NumValues, Sublist),
+    sum_list(Sublist, SublistSum),
+    MovingAverage is SublistSum / Count,
+    assertz(moving_average(Period, MovingAverage)).
+
+calculate_moving_averages :-
+    moving_average(10, MA10),
+    moving_average(20, MA20),
+    moving_average(50, MA50),
+    format("Moving Averages:\n", []),
+    format("MA10: ~w\n", [MA10]),
+    format("MA20: ~w\n", [MA20]),
+    format("MA50: ~w\n", [MA50]).
+
+sublist(List, StartIndex, EndIndex, Sublist) :-
+    length(Prefix, StartIndex),
+    append(Prefix, Rest, List),
+    length(Sublist, SublistLength),
+    length(Rest, RestLength),
+    RestLength >= SublistLength,
+    append(Sublist, _, Rest).

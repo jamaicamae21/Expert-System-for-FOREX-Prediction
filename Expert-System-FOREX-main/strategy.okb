@@ -1,0 +1,194 @@
+% FOREX Strategy Forward Chaining
+% Please change the corresponding strategies based on the
+% indicator you use.
+
+rule 1:
+[1: isa(candlestick, green),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 2:
+[1: isa(candlestick, green),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 3:
+[1: isa(candlestick, red),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 4:
+[1: isa(candlestick, red),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 5:
+[1: isa(candlestick, red),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(hold)),
+ retract(4)].
+
+rule 6:
+[1: isa(candlestick, green),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(hold)),
+ retract(4)].
+
+
+rule 7:
+[1: isa(candlestick, red),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 8:
+[1: isa(candlestick, red),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 9:
+[1: isa(candlestick, green),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 10:
+[1: isa(candlestick, green),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 10:
+[1: isa(candlestick, green),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(hold)),
+ retract(4)].
+
+rule 11:
+[1: isa(candlestick, red),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(hold)),
+ retract(4)].
+
+rule 12:
+[1: trend_is(going_bullish),
+ 2: isa(candlestick, green),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 13:
+[1: trend_is(going_bullish),
+ 2: isa(candlestick, green),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 14:
+[1: trend_is(going_bullish),
+ 2: isa(candlestick, green),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 15:
+[1: trend_is(going_bearish),
+ 2: isa(candlestick, red),
+ 3: zone(candlestick, above),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 16:
+[1: trend_is(going_bearish),
+ 2: isa(candlestick, red),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 17:
+[1: trend_is(going_bearish),
+ 2: isa(candlestick, red),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+rule 18:
+[1: isa(candlestick, neutral),
+ 2: order(none)]
+==>
+[assert(order(hold)),
+ retract(2)].
+
+rule 19:
+[1: trend_is(not_clear),
+ 2: order(none)]
+==>
+[assert(order(hold)),
+ retract(2)].
+
+rule 20:
+[1: zone(candlestick, not_clear),
+ 2: order(none)]
+==>
+[assert(order(hold)),
+ retract(2)].
+ 
+
+rule 21:
+[1: order(none)]
+==>
+[assert(order(hold)),
+ retract(1)].

@@ -1,0 +1,30 @@
+% FOREX Strategy Forward Chaining
+% Please change the corresponding strategies based on the
+% indicator you use.
+
+rule 1:
+[1: isa(candlestick, green),
+ 2: trend_is(bullish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(buy)),
+ retract(4)].
+
+rule 5:
+[1: isa(candlestick, red),
+ 2: trend_is(bearish),
+ 3: zone(candlestick, thezone),
+ 4: order(none)]
+==>
+[assert(order(sell)),
+ retract(4)].
+
+ rule 13:
+[1: trend_is(going_bearish),
+ 2: isa(candlestick, red),
+ 3: zone(candlestick, below),
+ 4: order(none)]
+==>
+[assert(order(hold)),
+ retract(4)].
